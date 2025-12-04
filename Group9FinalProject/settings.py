@@ -9,6 +9,8 @@ https://docs.djangoproject.com/en/5.2/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/5.2/ref/settings/
 """
+import pymysql
+pymysql.install_as_MySQLdb()
 import os
 from pathlib import Path
 import environ
@@ -31,6 +33,9 @@ SECRET_KEY = "django-insecure-c$&1g%xs#=%**xodsqtg2oq*hc#^fhqss=c1xv(h_w4s&oh)^!
 DEBUG = True
 
 ALLOWED_HOSTS = []
+
+LOGIN_URL = "/login/"
+LOGIN_REDIRECT_URL = "/home/"
 
 
 # Application definition
@@ -90,6 +95,10 @@ DATABASES = {
     }
 }
 
+# Authentication backends
+AUTHENTICATION_BACKENDS = [
+    'django.contrib.auth.backends.ModelBackend',
+]
 
 # Password validation
 # https://docs.djangoproject.com/en/5.2/ref/settings/#auth-password-validators

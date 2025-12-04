@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Home</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+        }
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+        .welcome {
+            font-size: 24px;
+        }
+        .logout-btn {
+            background-color: #dc3545;
+            color: white;
+            padding: 10px 20px;
+            text-decoration: none;
+            border-radius: 5px;
+        }
+        .logout-btn:hover {
+            background-color: #c82333;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="welcome">
+            <h1>Welcome, {{ user.username }}! 🎉</h1>
+            <p>You are successfully logged in.</p>
+        </div>
+        <form method="post" action="{% url 'logout' %}">
+            {% csrf_token %}
+            <button type="submit" class="logout-btn">Logout</button>
+        </form>
+    </div>
+
+    <div class="content">
+        <h2>Your Dashboard</h2>
+        <ul>
+            <li>Username: {{ user.username }}</li>
+            <li>Email: {{ user.email|default:"Not set" }}</li>
+            <li>Date Joined: {{ user.date_joined|date:"F d, Y" }}</li>
+        </ul>
+    </div>
+</body>
+</html>

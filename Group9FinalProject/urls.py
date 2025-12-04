@@ -17,7 +17,14 @@ Including another URLconf
 
 from django.contrib import admin
 from django.urls import path
+from django.contrib.auth.views import LogoutView
+from quiz_taker import views
+from quiz_taker.views import home_view
 
 urlpatterns = [
     path("admin/", admin.site.urls),
+    path("", views.LoginView.as_view(), name="login"),
+    path("logout/", LogoutView.as_view(next_page='login'), name="logout"),
+    path("register/", views.RegisterView.as_view(), name="register"),
+    path('home/', home_view, name='home'),
 ]
