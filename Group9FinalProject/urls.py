@@ -26,10 +26,9 @@ urlpatterns = [
     path("admin/", admin.site.urls),
     path("", views.login_view, name="login"),
     path("home/", home_view, name="home"),
-    path("logout/", LogoutView.as_view(next_page='login'), name="logout"),
+    path("logout/", views.logout_view, name="logout"),
     path("register/", views.register_view, name="register"),
     path("instructor/home/", views.instructor_home, name="instructor_home"),
     path("student/home/", views.student_home, name="student_home"),
-
     path("quiz/", include("quiz_taker.urls")),
 ]

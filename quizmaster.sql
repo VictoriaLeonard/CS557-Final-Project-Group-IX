@@ -273,3 +273,5 @@ BEGIN
 END //
 DELIMITER ;
 
+DELETE FROM student_responses;
+DELETE FROM student_attempts;

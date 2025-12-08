@@ -1,22 +1,31 @@
-<h1>Attempts for Quiz: {{ quiz.title }}</h1>
+<h1>Available Quizzes</h1>
 
+{% if quizzes %}
 <table border="1" cellpadding="5">
     <tr>
-        <th>Student</th>
-        <th>Score</th>
-        <th>Submitted</th>
-        <th>Completed</th>
+        <th>Title</th>
+        <th>Description</th>
+        <th>Start</th>
+        <th>End</th>
+        <th>Action</th>
     </tr>
 
-    {% for attempt in attempts %}
+    {% for quiz in quizzes %}
     <tr>
-        <td>{{ attempt.student.username }}</td>
-        <td>{{ attempt.score }}</td>
-        <td>{{ attempt.submit_time }}</td>
-        <td>{{ attempt.is_completed|yesno:"Yes,No" }}</td>
+        <td>{{ quiz.title }}</td>
+        <td>{{ quiz.description }}</td>
+        <td>{{ quiz.start_date }}</td>
+        <td>{{ quiz.end_date }}</td>
+        <td>
+            <a href="/quiz/student/quizzes/{{ quiz.quiz_id }}/preview/">Preview</a>
+        </td>
     </tr>
     {% endfor %}
 </table>
 
+{% else %}
+<p>No quizzes available right now.</p>
+{% endif %}
+
 <br>
-<a href="/quiz/instructor/quizzes/">Back</a>
+<a href="/student/home/">Back to Dashboard</a>

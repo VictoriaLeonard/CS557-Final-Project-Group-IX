@@ -1,7 +1,9 @@
+from urllib import request
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
 from django.contrib.auth import logout as django_logout
+from django.utils import timezone
 from django.views.decorators.csrf import csrf_exempt
 from django.db import connection
 import time
@@ -126,13 +128,13 @@ def logout_view(request):
 @login_required_custom
 def instructor_home(request):
     user = get_user_by_id(request.session["user_id"])
-    return render(request, "teachers/home.html", {"users": user})
+    return render(request, "teachers/home.html", {"user": user})
 
 
 @login_required_custom
 def student_home(request):
     user = get_user_by_id(request.session["user_id"])
-    return render(request, "students/home.html", {"users": user})
+    return render(request, "students/home.html", {"user": user})
 
 
 # Default home redirector
@@ -151,20 +153,39 @@ def instructor_required(view_func):
         return view_func(request, *args, **kwargs)
     return wrapper
 
+def student_required(view_func):
+    def wrapper(request, *args, **kwargs):
+        if request.session.get("role") != "student":
+            messages.error(request, "Student access required.")
+            return redirect("home")
+        return view_func(request, *args, **kwargs)
+    return wrapper
 
 @instructor_required
 def create_quiz(request):
     if request.method == "POST":
         title = request.POST.get("title")
         description = request.POST.get("description")
-        time_limit = request.POST.get("time_limit")
         passing = request.POST.get("passing_score")
         start_date = request.POST.get("start_date")
         end_date = request.POST.get("end_date")
 
         instructor_id = request.session["user_id"]
 
-        # Insert quiz
+        # --- FIXED TIME LIMIT VALIDATION ---
+        raw_time_limit = request.POST.get("time_limit")
+
+        if not raw_time_limit:
+            messages.error(request, "Time limit is required.")
+            return redirect("create_quiz")
+
+        try:
+            time_limit = int(raw_time_limit)
+        except ValueError:
+            messages.error(request, "Time limit must be a number.")
+            return redirect("create_quiz")
+
+        # Insert quiz safely
         with connection.cursor() as cursor:
             cursor.execute("""
                 INSERT INTO quizzes (instructor_id, title, description, time_limit, passing_score, start_date, end_date)
@@ -264,11 +285,28 @@ def quiz_attempts(request, quiz_id):
     })
 
 
+
+@student_required
+@login_required_custom
 def available_quizzes(request):
-    quizzes = Quizzes.objects.filter(is_active=1)
+    now = timezone.now()
+
+    student_id = request.session["user_id"]
+
+    print("DB QUIZ COUNT:", Quizzes.objects.count())
+    print("DB QUIZ RAW:",
+          list(Quizzes.objects.all().values_list("quiz_id", "title", "start_date", "end_date", "is_active")))
+
+    quizzes = Quizzes.objects.filter(
+        is_active=1,
+        start_date__lte=now,
+        end_date__gte=now,
+    )
+
     return render(request, "quiz/student/available_quizzes.html", {"quizzes": quizzes})
 
-
+@student_required
+@login_required_custom
 def quiz_preview(request, quiz_id):
     quiz = get_object_or_404(Quizzes, pk=quiz_id)
     questions = Questions.objects.filter(quiz_id=quiz_id)
@@ -280,7 +318,8 @@ def quiz_preview(request, quiz_id):
         "total_points": total_points
     })
 
-
+@student_required
+@login_required_custom
 def start_quiz(request, quiz_id):
     student_id = request.session["user_id"]
 
@@ -297,7 +336,8 @@ def start_quiz(request, quiz_id):
 
     return redirect("take_quiz", attempt_id=attempt_id, question_number=1)
 
-
+@student_required
+@login_required_custom
 def take_quiz(request, attempt_id, question_number):
     attempt = get_object_or_404(StudentAttempts, pk=attempt_id)
     quiz_id = attempt.quiz_id
@@ -314,16 +354,24 @@ def take_quiz(request, attempt_id, question_number):
     # Save answer if POST
     if request.method == "POST":
         chosen = request.POST.get("answer")
+        action = request.POST.get("action")
 
+        # Save the answer
         with connection.cursor() as cursor:
             cursor.execute("""
-                INSERT INTO student_responses (attempt_id, question_id, selected_answer_id)
-                VALUES (%s, %s, %s)
-                ON DUPLICATE KEY UPDATE selected_answer_id = VALUES(selected_answer_id)
-            """, [attempt_id, question.question_id, chosen])
+                           INSERT INTO student_responses (attempt_id, question_id, selected_answer_id)
+                           VALUES (%s, %s, %s) ON DUPLICATE KEY
+                           UPDATE selected_answer_id =
+                           VALUES (selected_answer_id)
+                           """, [attempt_id, question.question_id, chosen])
 
-        # Next question
-        return redirect("take_quiz", attempt_id=attempt_id, question_number=question_number + 1)
+        # If the user clicked NEXT → go to next question
+        if action == "next":
+            return redirect("take_quiz", attempt_id=attempt_id, question_number=question_number + 1)
+
+        # If SUBMIT → go directly to submit_quiz
+        if action == "submit":
+            return redirect("submit_quiz", attempt_id=attempt_id)
 
     return render(request, "quiz/student/take_quiz.html", {
         "question": question,
@@ -333,32 +381,47 @@ def take_quiz(request, attempt_id, question_number):
         "attempt_id": attempt_id
     })
 
-
+@student_required
+@login_required_custom
 def submit_quiz(request, attempt_id):
     attempt = get_object_or_404(StudentAttempts, pk=attempt_id)
 
-    # Calculate score (your trigger also handles this)
     with connection.cursor() as cursor:
+        # 1) Update each response: mark is_correct and points_earned
         cursor.execute("""
-            UPDATE student_attempts
-            SET score = (
-                SELECT SUM(
-                    CASE WHEN a.is_correct = 1 THEN q.points ELSE 0 END
-                )
-                FROM student_responses sr
-                JOIN answers a ON sr.selected_answer_id = a.answer_id
-                JOIN questions q ON sr.question_id = q.question_id
-                WHERE sr.attempt_id = %s
-            ),
-            is_completed = 1,
-            submit_time = NOW()
-            WHERE attempt_id = %s
+            UPDATE student_responses sr
+            JOIN answers a ON sr.selected_answer_id = a.answer_id
+            JOIN questions q ON sr.question_id = q.question_id
+            SET
+                sr.is_correct = a.is_correct,
+                sr.points_earned = CASE
+                    WHEN a.is_correct = 1 THEN q.points
+                    ELSE 0
+                END
+            WHERE sr.attempt_id = %s
+        """, [attempt_id])
+
+        # 2) Update the attempt's score based on points_earned
+        cursor.execute("""
+            UPDATE student_attempts sa
+            JOIN (
+                SELECT attempt_id, COALESCE(SUM(points_earned), 0) AS total_score
+                FROM student_responses
+                WHERE attempt_id = %s
+                GROUP BY attempt_id
+            ) t ON sa.attempt_id = t.attempt_id
+            SET
+                sa.score = t.total_score,
+                sa.is_completed = 1,
+                sa.submit_time = NOW()
+            WHERE sa.attempt_id = %s
         """, [attempt_id, attempt_id])
 
     messages.success(request, "Quiz submitted!")
     return redirect("view_results", attempt_id=attempt_id)
 
-
+@student_required
+@login_required_custom
 def view_results(request, attempt_id):
     attempt = get_object_or_404(StudentAttempts, pk=attempt_id)
     responses = StudentResponses.objects.filter(attempt_id=attempt_id)
@@ -368,7 +431,8 @@ def view_results(request, attempt_id):
         "responses": responses
     })
 
-
+@student_required
+@login_required_custom
 def quiz_history(request):
     student_id = request.session["user_id"]
     attempts = StudentAttempts.objects.filter(student_id=student_id)
