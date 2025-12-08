@@ -1,31 +1,21 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Login</title>
-</head>
-<body>
+{% extends 'base.html' %}
 
-<h2>Login</h2>
+{% block title %}Login{% endblock %}
 
-{% if messages %}
-    {% for message in messages %}
-        <div>{{ message }}</div>
-    {% endfor %}
-{% endif %}
+{% block content %}
+<div class="card" style="max-width: 500px; margin: 0 auto;">
+    <h2>Login</h2>
+    <form method="post" style="margin-top: 1rem;">
+        {% csrf_token %}
 
-<form method="post">
-    {% csrf_token %}
+        <label>Username:</label><br>
+        <input type="text" name="username"><br><br>
 
-    <label>Username:</label><br>
-    <input type="text" name="username"><br><br>
+        <label>Password:</label><br>
+        <input type="password" name="password"><br><br>
 
-    <label>Password:</label><br>
-    <input type="password" name="password"><br><br>
-
-    <button type="submit">Login</button>
-</form>
-
-<p>Don't have an account? <a href="{% url 'register' %}">Sign up here</a></p>
-
-</body>
-</html>
+        <button type="submit" class="btn btn-primary">Login</button>
+    </form>
+    <p style="margin-top: 1rem;">Don't have an account? <a href="{% url 'register' %}">Sign up here</a></p>
+</div>
+{% endblock %}

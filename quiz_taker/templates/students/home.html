@@ -1,30 +1,33 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Student Dashboard</title>
-</head>
-<body>
+{% extends 'base.html' %}
 
-<h1>Welcome, {{ user.username }}!</h1>
+{% block title %}Student Dashboard{% endblock %}
 
-{% if messages %}
-    {% for message in messages %}
-        <div>{{ message }}</div>
-    {% endfor %}
-{% endif %}
+{% block content %}
+<div class="card">
+    <h1>Welcome, {{ user.username }}!</h1>
 
-<hr>
+    <hr style="margin: 2rem 0;">
 
-<h2>Menu</h2>
+    {% if messages %}
+        {% for message in messages %}
+            <div>{{ message }}</div>
+        {% endfor %}
+        <hr style="margin: 2rem 0;">
+    {% endif %}
 
-<ul>
-    <li><a href="/quiz/student/quizzes/">Available Quizzes</a></li>
-    <li><a href="/quiz/student/history/">My Quiz History</a></li>
-</ul>
 
-<hr>
 
-<a href="/logout/">Logout</a>
+    <h2>Quiz Menu</h2>
+    <br>
+    <form method="post" action="{% url 'available_quizzes' %}" style="display: inline;">
+        {% csrf_token %}
+        <button type="submit" class="btn btn-primary">My Quizzes</button>
+    </form>
+    <form method="post" action="{% url 'quiz_history' %}" style="display: inline;">
+        {% csrf_token %}
+        <button type="submit" class="btn btn-primary">Create New Quiz</button>
+    </form>
 
-</body>
-</html>
+
+</div>
+{% endblock %}
