@@ -1,22 +1,33 @@
-<h1>Attempts for Quiz: {{ quiz.title }}</h1>
+{% extends 'base.html' %}
 
-<table border="1" cellpadding="5">
-    <tr>
-        <th>Student</th>
-        <th>Score</th>
-        <th>Submitted</th>
-        <th>Completed</th>
-    </tr>
+{% block title %}Quizzes{% endblock %}
 
-    {% for attempt in attempts %}
-    <tr>
-        <td>{{ attempt.student.username }}</td>
-        <td>{{ attempt.score }}</td>
-        <td>{{ attempt.submit_time }}</td>
-        <td>{{ attempt.is_completed|yesno:"Yes,No" }}</td>
-    </tr>
-    {% endfor %}
-</table>
+{% block content %}
+    <div class="card">
+        <h1>Attempts for Quiz: {{ quiz.title }}</h1>
+        <br>
+        <table border="1" cellpadding="5">
+            <tr>
+                <th>Student</th>
+                <th>Score</th>
+                <th>Submitted</th>
+                <th>Completed</th>
+            </tr>
 
-<br>
-<a href="/quiz/instructor/quizzes/">Back</a>
+            {% for attempt in attempts %}
+            <tr>
+                <td>{{ attempt.student.username }}</td>
+                <td>{{ attempt.score }}</td>
+                <td>{{ attempt.submit_time }}</td>
+                <td>{{ attempt.is_completed|yesno:"Yes,No" }}</td>
+            </tr>
+            {% endfor %}
+        </table>
+
+        <br>
+        <form method="post" action="{% url 'instructor_quizzes' %}" style="display: inline;">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-danger">Back</button>
+        </form>
+    </div>
+{% endblock %}
