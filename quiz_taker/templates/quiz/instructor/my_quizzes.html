@@ -1,0 +1,27 @@
+<h1>My Quizzes</h1>
+
+<a href="/quiz/instructor/quizzes/create/">Create New Quiz</a><br><br>
+
+<table border="1" cellpadding="5">
+    <tr>
+        <th>Title</th>
+        <th>Status</th>
+        <th>Actions</th>
+    </tr>
+
+    {% for quiz in quizzes %}
+    <tr>
+        <td>{{ quiz.title }}</td>
+        <td>{{ quiz.is_active|yesno:"Active,Inactive" }}</td>
+        <td>
+            <a href="/quiz/instructor/quizzes/{{ quiz.quiz_id }}/questions/add/">Add Questions</a> |
+            <a href="/quiz/instructor/quizzes/{{ quiz.quiz_id }}/toggle/">Toggle</a> |
+            <a href="/quiz/instructor/quizzes/{{ quiz.quiz_id }}/attempts/">Attempts</a> |
+            <a href="/quiz/instructor/quizzes/{{ quiz.quiz_id }}/delete/">Delete</a>
+        </td>
+    </tr>
+    {% endfor %}
+</table>
+
+<br>
+<a href="/home/">Back</a>

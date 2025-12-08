@@ -1,0 +1,31 @@
+<h1>Available Quizzes</h1>
+
+{% if quizzes %}
+<table border="1" cellpadding="5">
+    <tr>
+        <th>Title</th>
+        <th>Description</th>
+        <th>Start</th>
+        <th>End</th>
+        <th>Action</th>
+    </tr>
+
+    {% for quiz in quizzes %}
+    <tr>
+        <td>{{ quiz.title }}</td>
+        <td>{{ quiz.description }}</td>
+        <td>{{ quiz.start_date }}</td>
+        <td>{{ quiz.end_date }}</td>
+        <td>
+            <a href="/quiz/student/quizzes/{{ quiz.quiz_id }}/preview/">Preview</a>
+        </td>
+    </tr>
+    {% endfor %}
+</table>
+
+{% else %}
+<p>No quizzes available right now.</p>
+{% endif %}
+
+<br>
+<a href="/student/home/">Back to Dashboard</a>

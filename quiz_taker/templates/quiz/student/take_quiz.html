@@ -1,0 +1,22 @@
+<h1>Question {{ question_number }} of {{ total_questions }}</h1>
+
+<p>{{ question.question_text }}</p>
+
+<form method="post">
+    {% csrf_token %}
+
+    {% for a in answers %}
+        <label>
+            <input type="radio" name="answer" value="{{ a.answer_id }}" required>
+            {{ a.answer_text }}
+        </label><br>
+    {% endfor %}
+
+    {% if question_number < total_questions %}
+        <button type="submit" name="action" value="next">Next</button>
+    {% else %}
+        <button type="submit" name="action" value="submit">Submit Quiz</button>
+    {% endif %}
+</form>
+
+<br>

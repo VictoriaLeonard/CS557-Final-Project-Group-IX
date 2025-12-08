@@ -1,0 +1,24 @@
+<h1>Your Quiz History</h1>
+
+<table border="1" cellpadding="5">
+    <tr>
+        <th>Quiz</th>
+        <th>Score</th>
+        <th>Date</th>
+        <th>View</th>
+    </tr>
+
+    {% for attempt in attempts %}
+    <tr>
+        <td>{{ attempt.quiz.title }}</td>
+        <td>{{ attempt.score }}</td>
+        <td>{{ attempt.submit_time }}</td>
+        <td>
+            <a href="/quiz/student/attempt/{{ attempt.attempt_id }}/results/">View</a>
+        </td>
+    </tr>
+    {% endfor %}
+</table>
+
+<br>
+<a href="/home/">Back</a>
