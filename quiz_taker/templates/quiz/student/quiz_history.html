@@ -1,24 +1,40 @@
-<h1>Your Quiz History</h1>
+{% extends 'base.html' %}
 
-<table border="1" cellpadding="5">
-    <tr>
-        <th>Quiz</th>
-        <th>Score</th>
-        <th>Date</th>
-        <th>View</th>
-    </tr>
+{% block title %}Register{% endblock %}
 
-    {% for attempt in attempts %}
-    <tr>
-        <td>{{ attempt.quiz.title }}</td>
-        <td>{{ attempt.score }}</td>
-        <td>{{ attempt.submit_time }}</td>
-        <td>
-            <a href="/quiz/student/attempt/{{ attempt.attempt_id }}/results/">View</a>
-        </td>
-    </tr>
-    {% endfor %}
-</table>
+{% block content %}
+<div class="card">
+    <h1>Your Quiz History</h1>
+    {% if quizzes %}
+    <table border="1" cellpadding="5">
+        <tr>
+            <th>Quiz</th>
+            <th>Score</th>
+            <th>Date</th>
+            <th>View</th>
+        </tr>
 
-<br>
-<a href="/home/">Back</a>
+        {% for attempt in attempts %}
+        <tr>
+            <td>{{ attempt.quiz.title }}</td>
+            <td>{{ attempt.score }}</td>
+            <td>{{ attempt.submit_time }}</td>
+            <td>
+                <a href="/quiz/student/attempt/{{ attempt.attempt_id }}/results/">View</a>
+            </td>
+        </tr>
+        {% endfor %}
+    </table>
+
+    {% else %}
+        <br>
+        <p>No quiz history available right now.</p>
+    {% endif %}
+
+    <br>
+    <form method="post" action="{% url 'student_home' %}" style="display: inline;">
+        {% csrf_token %}
+        <button type="submit" class="btn btn-primary">Dashboard</button>
+    </form>
+</div>
+{% endblock %}

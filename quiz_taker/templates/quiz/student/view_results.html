@@ -1,29 +1,40 @@
-<h1>Quiz Results</h1>
+{% extends 'base.html' %}
 
-<p>Score: {{ attempt.score }} / {{ attempt.total_points }}</p>
-<p>Percentage: {{ attempt.percentage }}%</p>
-<p>Completed: {{ attempt.submit_time }}</p>
+{% block title %}{% endblock %}
 
-<hr>
+{% block content %}
+    <div class="card">
+        <h1>Quiz Results</h1>
+        <br>
+        <p>Score: {{ attempt.score }} / {{ attempt.total_points }}</p>
+        <p>Percentage: {{ attempt.percentage }}%</p>
+        <p>Completed: {{ attempt.submit_time }}</p>
 
-<h2>Your Answers</h2>
+        <hr style="margin: 2rem 0;">
 
-{% for r in responses %}
-<div>
-    <b>{{ r.question.question_text }}</b><br>
+        <h2>Your Answers</h2>
+        <br>
+        {% for r in responses %}
+        <div>
+            <b>{{ r.question.question_text }}</b><br>
 
-    {% if r.selected_answer %}
-        Your Answer: {{ r.selected_answer.answer_text }}<br>
-    {% endif %}
+            {% if r.selected_answer %}
+                Your Answer: {{ r.selected_answer.answer_text }}<br>
+            {% endif %}
 
-    {% if r.is_correct %}
-        <span style="color:green">Correct</span>
-    {% else %}
-        <span style="color:red">Incorrect</span>
-    {% endif %}
-</div>
-<hr>
-{% endfor %}
+            {% if r.is_correct %}
+                <span style="color:green">Correct</span>
+            {% else %}
+                <span style="color:red">Incorrect</span>
+            {% endif %}
+            <br>
+        </div>
+        <hr style="margin: 2rem 0;">
+        {% endfor %}
 
-<br>
-<a href="/quiz/student/history/">View History</a>
+        <form method="post" action="{% url 'quiz_history' %}" style="display: inline;">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-primary">View History</button>
+        </form>
+    </div>
+{% endblock %}

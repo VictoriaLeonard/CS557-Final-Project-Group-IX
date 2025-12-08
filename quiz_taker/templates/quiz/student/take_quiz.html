@@ -1,22 +1,30 @@
-<h1>Question {{ question_number }} of {{ total_questions }}</h1>
+{% extends 'base.html' %}
 
-<p>{{ question.question_text }}</p>
+{% block title %}{% endblock %}
 
-<form method="post">
-    {% csrf_token %}
+{% block content %}
+    <div class="card">
+        <h1>Question {{ question_number }} of {{ total_questions }}</h1>
 
-    {% for a in answers %}
-        <label>
-            <input type="radio" name="answer" value="{{ a.answer_id }}" required>
-            {{ a.answer_text }}
-        </label><br>
-    {% endfor %}
+        <p>{{ question.question_text }}</p>
+        <br>
+        <form method="post">
+            {% csrf_token %}
 
-    {% if question_number < total_questions %}
-        <button type="submit" name="action" value="next">Next</button>
-    {% else %}
-        <button type="submit" name="action" value="submit">Submit Quiz</button>
-    {% endif %}
-</form>
+            {% for a in answers %}
+                <label>
+                    <input type="radio" name="answer" value="{{ a.answer_id }}" required>
+                    {{ a.answer_text }}
+                </label><br>
+            {% endfor %}
+            <br>
+            {% if question_number < total_questions %}
+                <button type="submit" name="action" value="next" class="btn btn-primary" style="padding: 5px 10px; font-size: 0.875rem;">Next</button>
+            {% else %}
+                <button type="submit" name="action" value="submit" class="btn btn-primary" style="padding: 5px 10px; font-size: 0.875rem;">Submit Quiz</button>
+            {% endif %}
+        </form>
 
-<br>
+        <br>
+    </div>
+{% endblock %}
