@@ -1,0 +1,28 @@
+<h1>Add Answers to Question</h1>
+
+<p><b>{{ question.question_text }}</b></p>
+
+<form method="POST">
+    {% csrf_token %}
+
+    <label>Answer Text:</label><br>
+    <input type="text" name="answer_text"><br><br>
+
+    <label>Correct Answer:</label>
+    <input type="checkbox" name="is_correct"><br><br>
+
+    <button type="submit">Add Answer</button>
+</form>
+
+<hr>
+
+<h2>Existing Answers</h2>
+{% for a in answers %}
+<p>
+    {{ a.answer_text }}
+    {% if a.is_correct %} <b>(Correct)</b> {% endif %}
+</p>
+{% endfor %}
+
+<br>
+<a href="/quiz/instructor/quizzes/">Back to Quizzes</a>

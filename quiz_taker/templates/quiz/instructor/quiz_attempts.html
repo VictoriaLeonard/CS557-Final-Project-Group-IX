@@ -1,0 +1,22 @@
+<h1>Attempts for Quiz: {{ quiz.title }}</h1>
+
+<table border="1" cellpadding="5">
+    <tr>
+        <th>Student</th>
+        <th>Score</th>
+        <th>Submitted</th>
+        <th>Completed</th>
+    </tr>
+
+    {% for attempt in attempts %}
+    <tr>
+        <td>{{ attempt.student.username }}</td>
+        <td>{{ attempt.score }}</td>
+        <td>{{ attempt.submit_time }}</td>
+        <td>{{ attempt.is_completed|yesno:"Yes,No" }}</td>
+    </tr>
+    {% endfor %}
+</table>
+
+<br>
+<a href="/quiz/instructor/quizzes/">Back</a>

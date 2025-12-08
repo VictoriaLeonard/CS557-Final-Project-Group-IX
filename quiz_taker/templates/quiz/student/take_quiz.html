@@ -1,0 +1,19 @@
+<h1>Question {{ question_number }} of {{ total_questions }}</h1>
+
+<p>{{ question.question_text }}</p>
+
+<form method="POST">
+    {% csrf_token %}
+
+    {% for ans in answers %}
+    <div>
+        <input type="radio" name="answer" value="{{ ans.answer_id }}">
+        {{ ans.answer_text }}
+    </div>
+    {% endfor %}
+
+    <button type="submit">Next</button>
+</form>
+
+<br>
+<a href="/quiz/student/attempt/{{ attempt_id }}/submit/">Submit Quiz</a>
