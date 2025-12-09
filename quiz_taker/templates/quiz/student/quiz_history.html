@@ -5,7 +5,8 @@
 {% block content %}
 <div class="card">
     <h1>Your Quiz History</h1>
-    {% if quizzes %}
+    <br>
+    {% if attempts %}
     <table border="1" cellpadding="5">
         <tr>
             <th>Quiz</th>
@@ -20,7 +21,7 @@
             <td>{{ attempt.score }}</td>
             <td>{{ attempt.submit_time }}</td>
             <td>
-                <a href="/quiz/student/attempt/{{ attempt.attempt_id }}/results/">View</a>
+                <a href="/quiz/student/attempt/{{ attempt.attempt_id }}/results/" class="btn btn-primary">View</a>
             </td>
         </tr>
         {% endfor %}
@@ -34,7 +35,7 @@
     <br>
     <form method="post" action="{% url 'student_home' %}" style="display: inline;">
         {% csrf_token %}
-        <button type="submit" class="btn btn-primary">Dashboard</button>
+        <button type="submit" class="btn btn-danger">Dashboard</button>
     </form>
 </div>
 {% endblock %}
