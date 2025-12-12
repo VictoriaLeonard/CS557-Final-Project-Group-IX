@@ -1,33 +1,30 @@
 {% extends 'base.html' %}
 
-{% block title %}Quizzes{% endblock %}
+{% block title %}Quiz Attempts{% endblock %}
 
 {% block content %}
-    <div class="card">
-        <h1>Attempts for Quiz: {{ quiz.title }}</h1>
-        <br>
-        <table border="1" cellpadding="5">
-            <tr>
-                <th>Student</th>
-                <th>Score</th>
-                <th>Submitted</th>
-                <th>Completed</th>
-            </tr>
+<div class="card">
+    <h1>Attempts for Quiz: {{ quiz.title }}</h1>
 
-            {% for attempt in attempts %}
-            <tr>
-                <td>{{ attempt.student.username }}</td>
-                <td>{{ attempt.score }}</td>
-                <td>{{ attempt.submit_time }}</td>
-                <td>{{ attempt.is_completed|yesno:"Yes,No" }}</td>
-            </tr>
-            {% endfor %}
-        </table>
+    <table border="1" cellpadding="5">
+        <tr>
+            <th>Student</th>
+            <th>Score</th>
+            <th>Submitted</th>
+            <th>Completed</th>
+        </tr>
 
-        <br>
-        <form method="post" action="{% url 'instructor_quizzes' %}" style="display: inline;">
-            {% csrf_token %}
-            <button type="submit" class="btn btn-danger">Back</button>
-        </form>
-    </div>
+        {% for attempt in attempts %}
+        <tr>
+            <td>{{ attempt.student.username }}</td>
+            <td>{{ attempt.score }}</td>
+            <td>{{ attempt.submit_time }}</td>
+            <td>{{ attempt.is_completed|yesno:"Yes,No" }}</td>
+        </tr>
+        {% endfor %}
+    </table>
+
+    <br>
+    <a href="{% url 'instructor_quizzes' %}" class="btn btn-danger">Back</a>
+</div>
 {% endblock %}

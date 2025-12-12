@@ -1,11 +1,11 @@
 {% extends 'base.html' %}
 
-{% block title %}Register{% endblock %}
+{% block title %}Quiz History{% endblock %}
 
 {% block content %}
 <div class="card">
     <h1>Your Quiz History</h1>
-    <br>
+
     {% if attempts %}
     <table border="1" cellpadding="5">
         <tr>
@@ -21,21 +21,18 @@
             <td>{{ attempt.score }}</td>
             <td>{{ attempt.submit_time }}</td>
             <td>
-                <a href="/quiz/student/attempt/{{ attempt.attempt_id }}/results/" class="btn btn-primary">View</a>
+                <a href="{% url 'view_results' attempt.attempt_id %}"
+                   class="btn btn-primary">View</a>
             </td>
         </tr>
         {% endfor %}
     </table>
 
     {% else %}
-        <br>
-        <p>No quiz history available right now.</p>
+        <p>No quiz history available.</p>
     {% endif %}
 
     <br>
-    <form method="post" action="{% url 'student_home' %}" style="display: inline;">
-        {% csrf_token %}
-        <button type="submit" class="btn btn-danger">Dashboard</button>
-    </form>
+    <a href="{% url 'student_home' %}" class="btn btn-primary">Dashboard</a>
 </div>
 {% endblock %}

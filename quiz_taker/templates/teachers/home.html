@@ -5,26 +5,24 @@
 {% block content %}
 <div class="card">
     <h1>Welcome, Instructor {{ user.username }}!</h1>
-
-    <hr style="margin: 2rem 0;">
-    {% if messages %}
-        {% for message in messages %}
-            <div>{{ message }}</div>
-        {% endfor %}
-        <hr style="margin: 2rem 0;">
-    {% endif %}
-
-    <h2>Quiz Menu</h2>
     <br>
-    <form method="post" action="{% url 'instructor_quizzes' %}" style="display: inline;">
-        {% csrf_token %}
-        <button type="submit" class="btn btn-primary">My Quizzes</button>
-    </form>
-    <form method="post" action="{% url 'create_quiz' %}" style="display: inline;">
-        {% csrf_token %}
-        <button type="submit" class="btn btn-primary">Create New Quiz</button>
-    </form>
 
+    <h2>Menu</h2>
+    <ul>
+        <li>
+            <a class="btn btn-primary" href="{% url 'instructor_quizzes' %}">
+                My Quizzes
+            </a>
+        </li>
+        <br>
+        <li>
+            <a class="btn btn-primary" href="{% url 'create_quiz' %}">
+                Create New Quiz
+            </a>
+        </li>
+    </ul>
 
+    <br>
+    <a href="{% url 'logout' %}" class="btn btn-danger">Logout</a>
 </div>
 {% endblock %}

@@ -1,39 +1,36 @@
 {% extends 'base.html' %}
 
-{% block title %}Quizzes{% endblock %}
+{% block title %}My Quizzes{% endblock %}
 
 {% block content %}
-    <div class="card">
-        <h1>My Quizzes</h1>
-        <br>
-        <form method="post" action="{% url 'create_quiz' %}" style="display: inline;">
-            {% csrf_token %}
-            <button type="submit" class="btn btn-primary">Create New Quiz</button>
-        </form>
-        <br><br>
+<div class="card">
+    <h1>My Quizzes</h1>
 
-        <table border="1" cellpadding="5">
-            <tr>
-                <th>Title</th>
-                <th>Status</th>
-                <th>Actions</th>
-            </tr>
+    <a href="{% url 'create_quiz' %}" class="btn btn-primary">Create New Quiz</a>
+    <br><br>
 
-            {% for quiz in quizzes %}
-            <tr>
-                <td>{{ quiz.title }}</td>
-                <td>{{ quiz.is_active|yesno:"Active,Inactive" }}</td>
-                <td>
-                    <a href="/quiz/instructor/quizzes/{{ quiz.quiz_id }}/questions/add/" class="btn btn-primary" style="padding: 5px 10px; font-size: 0.875rem;">Add Questions</a> |
-                    <a href="/quiz/instructor/quizzes/{{ quiz.quiz_id }}/toggle/" class="btn btn-primary" style="padding: 5px 10px; font-size: 0.875rem;">Toggle Status</a> |
-                    <a href="/quiz/instructor/quizzes/{{ quiz.quiz_id }}/attempts/" class="btn btn-primary" style="padding: 5px 10px; font-size: 0.875rem;">Attempts</a> |
-                    <a href="/quiz/instructor/quizzes/{{ quiz.quiz_id }}/delete/" class="btn btn-primary" style="padding: 5px 10px; font-size: 0.875rem;">Delete</a>
-                </td>
-            </tr>
-            {% endfor %}
-        </table>
+    <table border="1" cellpadding="5">
+        <tr>
+            <th>Title</th>
+            <th>Status</th>
+            <th>Actions</th>
+        </tr>
 
-        <br>
-        <a href="/home/" class="btn btn-danger" style="padding: 5px 10px; font-size: 0.875rem;">Back</a>
-    </div>
+        {% for quiz in quizzes %}
+        <tr>
+            <td>{{ quiz.title }}</td>
+            <td>{{ quiz.is_active|yesno:"Active,Inactive" }}</td>
+            <td>
+                <a href="{% url 'add_question' quiz.quiz_id %}" class="btn btn-primary">Add Questions</a> |
+                <a href="{% url 'toggle_quiz_status' quiz.quiz_id %}" class="btn btn-warning">Toggle</a> |
+                <a href="{% url 'quiz_attempts' quiz.quiz_id %}" class="btn btn-info">Attempts</a> |
+                <a href="{% url 'delete_quiz' quiz.quiz_id %}" class="btn btn-danger">Delete</a>
+            </td>
+        </tr>
+        {% endfor %}
+    </table>
+
+    <br>
+    <a href="{% url 'instructor_home' %}" class="btn btn-danger">Back</a>
+</div>
 {% endblock %}

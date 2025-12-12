@@ -38,6 +38,21 @@ CREATE TABLE quizzes (
     CONSTRAINT chk_date_order CHECK (end_date > start_date)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
+CREATE TABLE quiz_assignments (
+    assignment_id INT AUTO_INCREMENT PRIMARY KEY,
+    quiz_id INT NOT NULL,
+    student_id INT NOT NULL,
+    assigned_by INT NOT NULL COMMENT 'Instructor ID',
+    assigned_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    due_date DATETIME NULL,
+    FOREIGN KEY (quiz_id) REFERENCES quizzes(quiz_id) ON DELETE CASCADE,
+    FOREIGN KEY (student_id) REFERENCES users(user_id) ON DELETE CASCADE,
+    FOREIGN KEY (assigned_by) REFERENCES users(user_id) ON DELETE CASCADE,
+    UNIQUE KEY uniq_assignment (quiz_id, student_id),
+    INDEX idx_student (student_id),
+    INDEX idx_quiz (quiz_id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
 
 CREATE TABLE questions (
     question_id INT AUTO_INCREMENT PRIMARY KEY,
@@ -163,19 +178,6 @@ SELECT
 FROM student_attempts sa
 JOIN users u ON sa.student_id = u.user_id
 JOIN quizzes q ON sa.quiz_id = q.quiz_id;
-
-
-CREATE VIEW v_quiz_performance AS
-SELECT
-    q.quiz_id,
-    q.title,
-    COUNT(sa.attempt_id) AS attempts,
-    AVG(sa.percentage) AS avg_score,
-    MIN(sa.percentage) AS min_score,
-    MAX(sa.percentage) AS max_score
-FROM quizzes q
-LEFT JOIN student_attempts sa ON q.quiz_id = sa.quiz_id
-GROUP BY q.quiz_id, q.title;
 
 
 CREATE TRIGGER trg_quiz_created

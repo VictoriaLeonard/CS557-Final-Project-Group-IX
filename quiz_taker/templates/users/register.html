@@ -3,12 +3,13 @@
 {% block title %}Register{% endblock %}
 
 {% block content %}
-<div class="card" style="max-width: 500px; margin: 0 auto;">
+<div class="card">
     <h2>Create an Account</h2>
     <br>
+
     {% if messages %}
         {% for message in messages %}
-            <div>{{ message }}</div>
+            <div class="alert">{{ message }}</div>
         {% endfor %}
     {% endif %}
 
@@ -16,23 +17,27 @@
         {% csrf_token %}
 
         <label>Username:</label><br>
-        <input type="text" name="username"><br><br>
+        <input type="text" name="username" class="form-control" required><br>
 
         <label>Email:</label><br>
-        <input type="email" name="email"><br><br>
+        <input type="email" name="email" class="form-control" required><br>
 
         <label>Password:</label><br>
-        <input type="password" name="password"><br><br>
+        <input type="password" name="password" class="form-control" required><br>
 
         <label>Role:</label><br>
-        <select name="role">
+        <select name="role" class="form-control">
             <option value="student">Student</option>
             <option value="instructor">Instructor</option>
         </select>
-        <br><br>
+        <br>
 
         <button type="submit" class="btn btn-primary">Register</button>
     </form>
-    <p style="margin-top: 1rem;">Don't have an account? <a href="{% url 'login' %}">login here</a></p>
+
+    <br>
+    <p>Already have an account?
+        <a href="{% url 'login' %}">Login here</a>
+    </p>
 </div>
 {% endblock %}

@@ -1,39 +1,36 @@
 {% extends 'base.html' %}
 
-{% block title %}Quizzes{% endblock %}
+{% block title %}Create Quiz{% endblock %}
 
 {% block content %}
-    <div class="card">
-        <h1>Create Quiz</h1>
-        <br>
-        <form method="POST">
-            {% csrf_token %}
+<div class="card">
+    <h1>Create Quiz</h1>
 
-            <label>Title:</label><br>
-            <input type="text" name="title"><br><br>
+    <form method="POST">
+        {% csrf_token %}
 
-            <label>Description:</label><br>
-            <textarea name="description"></textarea><br><br>
+        <label>Title:</label><br>
+        <input type="text" name="title" required><br><br>
 
-            <label>Time Limit (minutes):</label><br>
-            <input type="number" name="time_limit"><br><br>
+        <label>Description:</label><br>
+        <textarea name="description"></textarea><br><br>
 
-            <label>Passing Score (%):</label><br>
-            <input type="number" name="passing_score"><br><br>
+        <label>Time Limit (minutes):</label><br>
+        <input type="number" name="time_limit" required><br><br>
 
-            <label>Start Date:</label><br>
-            <input type="datetime-local" name="start_date"><br><br>
+        <label>Passing Score (%):</label><br>
+        <input type="number" name="passing_score"><br><br>
 
-            <label>End Date:</label><br>
-            <input type="datetime-local" name="end_date"><br><br>
+        <label>Start Date:</label><br>
+        <input type="datetime-local" name="start_date" required><br><br>
 
-            <button type="submit" class="btn btn-primary">Create</button>
-        </form>
+        <label>End Date:</label><br>
+        <input type="datetime-local" name="end_date" required><br><br>
 
-        <br>
-        <form method="post" action="{% url 'instructor_home' %}" style="display: inline;">
-            {% csrf_token %}
-            <button type="submit" class="btn btn-danger">Dashboard</button>
-        </form>
-    </div>
+        <button type="submit" class="btn btn-primary">Create</button>
+    </form>
+
+    <br>
+    <a href="{% url 'instructor_quizzes' %}" class="btn btn-danger">Back</a>
+</div>
 {% endblock %}

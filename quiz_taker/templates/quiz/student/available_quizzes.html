@@ -1,11 +1,12 @@
 {% extends 'base.html' %}
 
-{% block title %}Quizzes{% endblock %}
+{% block title %}Available Quizzes{% endblock %}
 
 {% block content %}
-    <div class="card">
+<div class="card">
     <h1>Available Quizzes</h1>
     <br>
+
     {% if quizzes %}
     <table border="1" cellpadding="5">
         <tr>
@@ -23,20 +24,18 @@
             <td>{{ quiz.start_date }}</td>
             <td>{{ quiz.end_date }}</td>
             <td>
-                <a href="/quiz/student/quizzes/{{ quiz.quiz_id }}/preview/" class="btn btn-danger" style="padding: 5px 10px; font-size: 0.875rem;">Preview Quiz</a>
+                <a href="{% url 'quiz_preview' quiz.quiz_id %}"
+                   class="btn btn-danger"
+                   style="padding: 5px 10px; font-size: 0.875rem;">Preview Quiz</a>
             </td>
         </tr>
         {% endfor %}
     </table>
-
     {% else %}
-    <p>No quizzes available right now.</p>
+        <p>No quizzes available right now.</p>
     {% endif %}
 
     <br>
-    <form method="post" action="{% url 'student_home' %}" style="display: inline;">
-        {% csrf_token %}
-        <button type="submit" class="btn btn-primary">Dashboard</button>
-    </form>
+    <a href="{% url 'student_home' %}" class="btn btn-primary">Dashboard</a>
 </div>
 {% endblock %}

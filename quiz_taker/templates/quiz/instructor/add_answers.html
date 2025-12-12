@@ -1,36 +1,40 @@
 {% extends 'base.html' %}
 
-{% block title %}Quizzes{% endblock %}
+{% block title %}Add Answers{% endblock %}
 
 {% block content %}
-    <div class="card">
-        <h1>Add Answers to Question</h1>
-        <hr style="margin: 2rem 0;">
-        <p><b>{{ question.question_text }}</b></p>
-        <br>
-        <form method="POST">
-            {% csrf_token %}
+<div class="card">
+    <h1>Add Answers to Question</h1>
+    <hr>
 
-            <label>Answer Text:</label><br>
-            <input type="text" name="answer_text"><br><br>
+    <p><b>{{ question.question_text }}</b></p>
 
-            <label>Correct Answer:</label>
-            <input type="checkbox" name="is_correct"><br><br>
+    <form method="POST">
+        {% csrf_token %}
+        <label>Answer Text:</label><br>
+        <input type="text" name="answer_text" required><br><br>
 
-            <button type="submit" class="btn btn-primary">Add Answer</button>
-        </form>
+        <label>Correct Answer:</label>
+        <input type="checkbox" name="is_correct"><br><br>
 
-        <hr style="margin: 2rem 0;">
+        <button type="submit" class="btn btn-primary">Add Answer</button>
+    </form>
 
-        <h2>Existing Answers</h2>
-        {% for a in answers %}
+    <hr>
+    <h2>Existing Answers</h2>
+
+    {% for a in answers %}
         <p>
             {{ a.answer_text }}
-            {% if a.is_correct %} <b>(Correct)</b> {% endif %}
+            {% if a.is_correct %}
+                <b>(Correct)</b>
+            {% endif %}
         </p>
-        {% endfor %}
+    {% empty %}
+        <p>No answers yet.</p>
+    {% endfor %}
 
-        <br>
-        <a href="/quiz/instructor/quizzes/" class="btn btn-danger">Back to Quizzes</a>
-    </div>
+    <br>
+    <a href="{% url 'add_question' question.quiz_id %}" class="btn btn-danger">Back to Questions</a>
+</div>
 {% endblock %}

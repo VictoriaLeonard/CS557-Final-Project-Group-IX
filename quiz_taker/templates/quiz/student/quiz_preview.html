@@ -1,20 +1,27 @@
 {% extends 'base.html' %}
 
-{% block title %}Quizzes{% endblock %}
+{% block title %}Quiz Preview{% endblock %}
 
 {% block content %}
-    <div class="card">
-        <h1>{{ quiz.title }}</h1>
-        <br>
-        <p>{{ quiz.description }}</p>
-        <p>Total Questions: {{ questions|length }}</p>
-        <p>Total Points: {{ total_points }}</p>
-        <br>
-        <a href="/quiz/student/quizzes/{{ quiz.quiz_id }}/start/">
-            <button class="btn btn-primary" style="padding: 5px 10px; font-size: 0.875rem;">Start Quiz</button>
-        </a>
+<div class="card">
+    <h1>{{ quiz.title }}</h1>
+    <br>
+    <p>{{ quiz.description }}</p>
+    <p>Total Questions: {{ questions|length }}</p>
+    <p>Total Points: {{ total_points }}</p>
 
-        <br><br>
-        <a href="/quiz/student/quizzes/" class="btn btn-danger" style="padding: 5px 10px; font-size: 0.875rem;">Back</a>
-    </div>
+    <br>
+    <a href="{% url 'start_quiz' quiz.quiz_id %}">
+        <button class="btn btn-primary" style="padding: 5px 10px; font-size: 0.875rem;">
+            Start Quiz
+        </button>
+    </a>
+
+    <br><br>
+    <a href="{% url 'available_quizzes' %}"
+       class="btn btn-danger"
+       style="padding: 5px 10px; font-size: 0.875rem;">
+        Back
+    </a>
+</div>
 {% endblock %}

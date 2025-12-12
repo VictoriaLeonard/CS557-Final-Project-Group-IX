@@ -152,3 +152,75 @@ class Users(models.Model):
     class Meta:
         managed = False
         db_table = 'users'
+
+class Roles(models.Model):
+    role_id = models.AutoField(primary_key=True)
+    role_name = models.CharField(max_length=50, unique=True)
+
+    class Meta:
+        managed = False
+        db_table = 'roles'
+
+class UserRoleMap(models.Model):
+    user = models.ForeignKey('Users', models.DO_NOTHING)
+    role = models.ForeignKey('Roles', models.DO_NOTHING)
+
+    class Meta:
+        managed = False
+        db_table = 'user_role_map'
+        unique_together = (('user', 'role'),)
+
+
+class QuizCategories(models.Model):
+    category_id = models.AutoField(primary_key=True)
+    category_name = models.CharField(max_length=100, unique=True)
+
+    class Meta:
+        managed = False
+        db_table = 'quiz_categories'
+
+class QuizCategoryMap(models.Model):
+    quiz = models.ForeignKey('Quizzes', models.DO_NOTHING)
+    category = models.ForeignKey('QuizCategories', models.DO_NOTHING)
+
+    class Meta:
+        managed = False
+        db_table = 'quiz_category_map'
+        unique_together = (('quiz', 'category'),)
+
+class AuditLogs(models.Model):
+    log_id = models.AutoField(primary_key=True)
+    user = models.ForeignKey('Users', models.DO_NOTHING)
+    action = models.CharField(max_length=255)
+    log_timestamp = models.DateTimeField()
+
+    class Meta:
+        managed = False
+        db_table = 'audit_logs'
+
+
+class QuizAssignments(models.Model):
+    assignment_id = models.AutoField(primary_key=True)
+    quiz = models.ForeignKey(
+        'Quizzes',
+        on_delete=models.CASCADE,
+        db_column='quiz_id'
+    )
+    student = models.ForeignKey(
+        'Users',
+        on_delete=models.CASCADE,
+        db_column='student_id'
+    )
+    assigned_by = models.ForeignKey(
+        'Users',
+        on_delete=models.CASCADE,
+        related_name='assigned_quizzes',
+        db_column='assigned_by'
+    )
+    assigned_at = models.DateTimeField(auto_now_add=True)
+    due_date = models.DateTimeField(null=True, blank=True)
+
+    class Meta:
+        managed = False   # IMPORTANT since table already exists
+        db_table = 'quiz_assignments'
+        unique_together = (('quiz', 'student'),)
