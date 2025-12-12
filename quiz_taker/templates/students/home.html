@@ -1,30 +1,20 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Student Dashboard</title>
-</head>
-<body>
+{% extends 'base.html' %}
 
-<h1>Welcome, {{ user.username }}!</h1>
+{% block title %}Student Dashboard{% endblock %}
 
-{% if messages %}
-    {% for message in messages %}
-        <div>{{ message }}</div>
-    {% endfor %}
-{% endif %}
+{% block content %}
+<div class="card">
+    <h1>Welcome, {{ user.username }}!</h1>
+    <br>
 
-<hr>
+    <h2>Menu</h2>
+    <ul>
+        <li><a class="btn btn-primary" href="{% url 'available_quizzes' %}">Available Quizzes</a></li>
+        <br>
+        <li><a class="btn btn-primary" href="{% url 'quiz_history' %}">My Quiz History</a></li>
+    </ul>
 
-<h2>Menu</h2>
-
-<ul>
-    <li><a href="/quiz/student/quizzes/">Available Quizzes</a></li>
-    <li><a href="/quiz/student/history/">My Quiz History</a></li>
-</ul>
-
-<hr>
-
-<a href="/logout/">Logout</a>
-
-</body>
-</html>
+    <br>
+    <a href="{% url 'logout' %}" class="btn btn-danger">Logout</a>
+</div>
+{% endblock %}

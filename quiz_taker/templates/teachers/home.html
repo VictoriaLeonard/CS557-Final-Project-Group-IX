@@ -1,30 +1,28 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Instructor Dashboard</title>
-</head>
-<body>
+{% extends 'base.html' %}
 
-<h1>Welcome, Instructor {{ user.username }}</h1>
+{% block title %}Instructor Dashboard{% endblock %}
 
-{% if messages %}
-    {% for message in messages %}
-        <div>{{ message }}</div>
-    {% endfor %}
-{% endif %}
+{% block content %}
+<div class="card">
+    <h1>Welcome, Instructor {{ user.username }}!</h1>
+    <br>
 
-<hr>
+    <h2>Menu</h2>
+    <ul>
+        <li>
+            <a class="btn btn-primary" href="{% url 'instructor_quizzes' %}">
+                My Quizzes
+            </a>
+        </li>
+        <br>
+        <li>
+            <a class="btn btn-primary" href="{% url 'create_quiz' %}">
+                Create New Quiz
+            </a>
+        </li>
+    </ul>
 
-<h2>Menu</h2>
-
-<ul>
-    <li><a href="/quiz/instructor/quizzes/">My Quizzes</a></li>
-    <li><a href="/quiz/instructor/quizzes/create/">Create New Quiz</a></li>
-</ul>
-
-<hr>
-
-<a href="/logout/">Logout</a>
-
-</body>
-</html>
+    <br>
+    <a href="{% url 'logout' %}" class="btn btn-danger">Logout</a>
+</div>
+{% endblock %}

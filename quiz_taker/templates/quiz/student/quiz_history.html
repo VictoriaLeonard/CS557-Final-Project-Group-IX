@@ -1,24 +1,38 @@
-<h1>Your Quiz History</h1>
+{% extends 'base.html' %}
 
-<table border="1" cellpadding="5">
-    <tr>
-        <th>Quiz</th>
-        <th>Score</th>
-        <th>Date</th>
-        <th>View</th>
-    </tr>
+{% block title %}Quiz History{% endblock %}
 
-    {% for attempt in attempts %}
-    <tr>
-        <td>{{ attempt.quiz.title }}</td>
-        <td>{{ attempt.score }}</td>
-        <td>{{ attempt.submit_time }}</td>
-        <td>
-            <a href="/quiz/student/attempt/{{ attempt.attempt_id }}/results/">View</a>
-        </td>
-    </tr>
-    {% endfor %}
-</table>
+{% block content %}
+<div class="card">
+    <h1>Your Quiz History</h1>
 
-<br>
-<a href="/home/">Back</a>
+    {% if attempts %}
+    <table border="1" cellpadding="5">
+        <tr>
+            <th>Quiz</th>
+            <th>Score</th>
+            <th>Date</th>
+            <th>View</th>
+        </tr>
+
+        {% for attempt in attempts %}
+        <tr>
+            <td>{{ attempt.quiz.title }}</td>
+            <td>{{ attempt.score }}</td>
+            <td>{{ attempt.submit_time }}</td>
+            <td>
+                <a href="{% url 'view_results' attempt.attempt_id %}"
+                   class="btn btn-primary">View</a>
+            </td>
+        </tr>
+        {% endfor %}
+    </table>
+
+    {% else %}
+        <p>No quiz history available.</p>
+    {% endif %}
+
+    <br>
+    <a href="{% url 'student_home' %}" class="btn btn-primary">Dashboard</a>
+</div>
+{% endblock %}

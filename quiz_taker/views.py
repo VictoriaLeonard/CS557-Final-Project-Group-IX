@@ -7,14 +7,12 @@ from django.utils import timezone
 from django.views.decorators.csrf import csrf_exempt
 from django.db import connection
 import time
-
 from .models import (
     Users, Quizzes, Questions, Answers,
     StudentAttempts, StudentResponses,
     QuizCategories, QuizCategoryMap,
-    AuditLogs
+    AuditLogs, QuizAssignments
 )
-
 
 def get_user_by_credentials(username, password):
     """Authenticate against your custom Users table."""
@@ -283,24 +281,49 @@ def quiz_attempts(request, quiz_id):
         "quiz": quiz,
         "attempts": attempts
     })
+@instructor_required
+def assign_quiz(request, quiz_id):
+    if request.method == "POST":
+        student_id = request.POST.get("student_id")
+        instructor_id = request.session["user_id"]
+
+        with connection.cursor() as cursor:
+            cursor.execute("""
+                INSERT IGNORE INTO quiz_assignments
+                (quiz_id, student_id, assigned_by)
+                VALUES (%s, %s, %s)
+            """, [quiz_id, student_id, instructor_id])
+
+        messages.success(request, "Quiz assigned to student.")
+        return redirect("instructor_quizzes")
+
+    students = Users.objects.filter(role="student", is_active=1)
+    quiz = get_object_or_404(Quizzes, pk=quiz_id)
+
+    return render(request, "quiz/instructor/assign_quiz.html", {
+        "quiz": quiz,
+        "students": students
+    })
 
 
 
 @student_required
 @login_required_custom
 def available_quizzes(request):
+    student_id = request.session["user_id"]
     now = timezone.now()
 
-    student_id = request.session["user_id"]
-
-    print("DB QUIZ COUNT:", Quizzes.objects.count())
-    print("DB QUIZ RAW:",
-          list(Quizzes.objects.all().values_list("quiz_id", "title", "start_date", "end_date", "is_active")))
-
     quizzes = Quizzes.objects.filter(
+        quizassignments__student_id=student_id,
         is_active=1,
         start_date__lte=now,
         end_date__gte=now,
+    ).distinct()
+
+    return render(
+        request,
+        "quiz/student/available_quizzes.html",
+        {"quizzes": quizzes}
     )
 
     return render(request, "quiz/student/available_quizzes.html", {"quizzes": quizzes})
@@ -308,6 +331,17 @@ def available_quizzes(request):
 @student_required
 @login_required_custom
 def quiz_preview(request, quiz_id):
+    student_id = request.session["user_id"]
+
+    assigned = QuizAssignments.objects.filter(
+        quiz_id=quiz_id,
+        student_id=student_id
+    ).exists()
+
+    if not assigned:
+        messages.error(request, "You are not assigned to this quiz.")
+        return redirect("available_quizzes")
+
     quiz = get_object_or_404(Quizzes, pk=quiz_id)
     questions = Questions.objects.filter(quiz_id=quiz_id)
     total_points = sum(q.points or 0 for q in questions)
@@ -323,18 +357,35 @@ def quiz_preview(request, quiz_id):
 def start_quiz(request, quiz_id):
     student_id = request.session["user_id"]
 
+    assigned = QuizAssignments.objects.filter(
+        quiz_id=quiz_id,
+        student_id=student_id
+    ).exists()
+
+    if not assigned:
+        messages.error(request, "You are not assigned to this quiz.")
+        return redirect("available_quizzes")
+
     # Create attempt
     with connection.cursor() as cursor:
         cursor.execute("""
             INSERT INTO student_attempts (student_id, quiz_id, total_points)
             VALUES (%s, %s, (
-                SELECT COALESCE(SUM(points),0) FROM questions WHERE quiz_id=%s
+                SELECT COALESCE(SUM(points),0)
+                FROM questions
+                WHERE quiz_id=%s
             ))
         """, [student_id, quiz_id, quiz_id])
 
-    attempt_id = StudentAttempts.objects.filter(student_id=student_id, quiz_id=quiz_id).latest("attempt_id").attempt_id
+    attempt_id = (
+        StudentAttempts.objects
+        .filter(student_id=student_id, quiz_id=quiz_id)
+        .latest("attempt_id")
+        .attempt_id
+    )
 
     return redirect("take_quiz", attempt_id=attempt_id, question_number=1)
+
 
 @student_required
 @login_required_custom
